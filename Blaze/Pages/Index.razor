@@ -1,0 +1,61 @@
+﻿@page "/"
+@inject Blaze.Services.Iproductservice productservices
+
+@if (products == null)
+{
+    <MudText Style="text-align:center" Class="mt-4">Please wait ....</MudText>
+}else
+{
+  <div class="d-flex flex-column flex-row mt-2">
+      <div  class="d-flex flex-column p-3">
+          <MudGrid>
+              @foreach (var item in products)
+              {
+                  <MudItem lg="2" md="4" xs="6">
+                      <MudCard Class="m-2">
+                          <MudLink Href="@($"/product/{item.Id}")">
+                              <MudCardMedia Image="@item.Imgurl" Height="200" />
+                          </MudLink>
+                          <MudCardContent>
+                              <MudText Typo="Typo.h5">@item.Name</MudText>
+                          </MudCardContent>
+                          <MudCardActions>
+                              <MudText Typo="Typo.body1">@item.Price.ToString("c")</MudText>
+                              <MudSpacer/>
+                              <MudIconButton Icon="@Icons.Material.Filled.Timer" Color="Color.Primary" />
+                              <MudText>@item.CategoryID</MudText>
+                          </MudCardActions>
+                      </MudCard>
+                  </MudItem>
+              }
+          </MudGrid>
+      </div>
+  </div>
+}
+
+
+@code{
+    private string searchString = "";
+    List<Product> products = new List<Product>();
+    private Product product = new Product();
+    protected override async Task OnInitializedAsync()
+    {
+        GetProducts();
+    }
+     private List<Product> GetProducts()
+    {
+        products = productservices.GetProducts();
+        return products;
+    }
+     private bool Search(Product product)
+    {
+        if (string.IsNullOrWhiteSpace(searchString)) return true;
+        if (product.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || product.ShortDescription.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || product.Category.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+        return false;
+    }
+}
